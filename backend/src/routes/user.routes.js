@@ -11,6 +11,7 @@ import {
   updateUserDetails,
   updateAvatarImage,
   getAllUsers,
+  GeminiGenerateContent
 } from '../controllers/user.controllers.js';
 import { authRateLimit } from '../middlewares/ratelimit.middleware.js';
 import { cache } from '../middlewares/cache.middleware.js';
@@ -35,6 +36,9 @@ userRouter.route('/login').post(authRateLimit, loginUser);
 
 // Route for getting all users
 userRouter.route('/users', cache(300)).get(getAllUsers);
+
+// testing gemini
+userRouter.route('/test-gemini').post(GeminiGenerateContent)
 
 // ======================================================================
 // secured route only for logged in users

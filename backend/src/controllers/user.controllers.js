@@ -4,6 +4,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import { User } from '../models/user.model.js';
 import { uploadToCloudinary } from '../utils/cloudinary.js';
 import jwt from 'jsonwebtoken';
+import { generateContent } from '../Scripts/Gemini.js';
 
 // generate access token and refresh token
 /**
@@ -340,6 +341,17 @@ const getAllUsers = asyncHandler(async (req, res) => {
     );
 });
 
+// Gemini generate content controller 
+const GeminiGenerateContent = asyncHandler(async (req, res) => {
+  const topic = req.body;
+  const generatedContent = await generateContent(topic);
+
+  // return res.json(
+  //   new ApiResponse(200, generatedContent, 'Content generated successfully')
+  // );
+  return res.json(generatedContent);
+})
+
 export {
   registerUser,
   loginUser,
@@ -349,5 +361,6 @@ export {
   getCurrentUser,
   updateUserDetails,
   updateAvatarImage,
-  getAllUsers
+  getAllUsers,
+  GeminiGenerateContent
 };
