@@ -1,0 +1,41 @@
+services:
+  app:
+    build: . # Uses your Dockerfile to build the image
+    ports:
+      - '8080:8080' # Fixed port to match app's default
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGODB_URI=mongodb://mongodb:27017/productiongradebackend
+      - ACCESS_TOKEN_SECRET=your_access_token_secret_here
+      - ACCESS_TOKEN_EXPIRY=1d
+      - REFRESH_TOKEN_SECRET=your_refresh_token_secret_here
+      - REFRESH_TOKEN_EXPIRY=10d
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - CORS_ORIGIN=*
+    depends_on:
+      - mongodb
+    volumes:
+      - ./public/temp:/app/public/temp # Fixed path to match WORKDIR
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_DATABASE=productiongradebackend
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge

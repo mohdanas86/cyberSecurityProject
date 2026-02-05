@@ -1,0 +1,23 @@
+# Use official Node.js image as the base image
+FROM node:20-alpine
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
+
+# Install dependencies (including dev dependencies for building)
+RUN npm ci && npm cache clean --force
+
+# Copy the rest of the application code to the working directory
+COPY . .
+
+# Create temp directory for file uploads
+RUN mkdir -p public/temp
+
+# Expose the port the app runs on (matches the app's default port)
+EXPOSE 8080
+
+# Command to run the application
+CMD ["node", "src/index.js"]
