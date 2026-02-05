@@ -18,7 +18,6 @@ function DashboardContent() {
                 {user && (
                     <div className="mb-6">
                         <h2 className="text-lg font-semibold">Welcome, {user.fullName}!</h2>
-                        <p className="text-gray-600">Username: {user.username}</p>
                         <p className="text-gray-600">Email: {user.email}</p>
                         <img
                             src={user.avatar}

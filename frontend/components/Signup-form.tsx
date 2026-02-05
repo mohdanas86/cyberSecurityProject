@@ -25,12 +25,10 @@ export function SignupForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     password: '',
     fullName: '',
     avatar: null as File | null,
-    coverImage: null as File | null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +52,6 @@ export function SignupForm({
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.username) newErrors.username = 'Username is required';
     if (!formData.email) newErrors.email = 'Email is required';
     if (!formData.password) newErrors.password = 'Password is required';
     if (!formData.fullName) newErrors.fullName = 'Full name is required';
@@ -70,12 +67,10 @@ export function SignupForm({
     setIsLoading(true);
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('username', formData.username);
       formDataToSend.append('email', formData.email);
       formDataToSend.append('password', formData.password);
       formDataToSend.append('fullName', formData.fullName);
       if (formData.avatar) formDataToSend.append('avatar', formData.avatar);
-      if (formData.coverImage) formDataToSend.append('coverImage', formData.coverImage);
 
       await signup(formDataToSend);
       router.push('/dashboard');
@@ -98,18 +93,6 @@ export function SignupForm({
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="username">Username</FieldLabel>
-                <Input
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  placeholder="Enter username"
-                  required
-                />
-                {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
-              </Field>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -159,16 +142,6 @@ export function SignupForm({
                   required
                 />
                 {errors.avatar && <p className="text-red-500 text-sm mt-1">{errors.avatar}</p>}
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="coverImage">Cover Image (Optional)</FieldLabel>
-                <Input
-                  id="coverImage"
-                  name="coverImage"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
               </Field>
               {errors.general && (
                 <p className="text-red-500 text-sm">{errors.general}</p>

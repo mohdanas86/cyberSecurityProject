@@ -31,7 +31,7 @@ app.use(
         'http://localhost:3000',
         'http://localhost:3001',
         'http://127.0.0.1:3000',
-        'http://127.0.0.1:3001'
+        'http://127.0.0.1:3001',
       ];
 
       if (allowedOrigins.includes(origin)) {
@@ -64,7 +64,7 @@ import { healthCheckRateLimit } from './middlewares/ratelimit.middleware.js';
 import { ApiError } from './utils/apiError.js';
 
 // Use routes
-app.use('/api/v1/user', userRouter);
+app.use('/api/v1/users', userRouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

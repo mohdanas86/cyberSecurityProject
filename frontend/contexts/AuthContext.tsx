@@ -6,7 +6,7 @@ import { authAPI } from '@/lib/api';
 
 interface AuthContextType {
     user: User | null;
-    login: (data: { username?: string; email?: string; password: string }) => Promise<void>;
+    login: (data: { email: string; password: string }) => Promise<void>;
     signup: (formData: FormData) => Promise<void>;
     logout: () => Promise<void>;
     isLoading: boolean;
@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const login = async (data: { username?: string; email?: string; password: string }) => {
+    const login = async (data: { email: string; password: string }) => {
         const response = await authAPI.login(data);
         const { user, accessToken } = response.data;
         setUser(user);

@@ -10,7 +10,6 @@ import {
   getCurrentUser,
   updateUserDetails,
   updateAvatarImage,
-  updateCoverImage,
   getAllUsers,
 } from '../controllers/user.controllers.js';
 import { authRateLimit } from '../middlewares/ratelimit.middleware.js';
@@ -27,17 +26,12 @@ userRouter.route('/register').post(
       name: 'avatar',
       maxCount: 1,
     },
-    {
-      name: 'coverImage',
-      maxCount: 1,
-    },
   ]),
   registerUser
 );
 
 // Route for user login
 userRouter.route('/login').post(authRateLimit, loginUser);
-
 
 // Route for getting all users
 userRouter.route('/users', cache(300)).get(getAllUsers);
@@ -66,8 +60,4 @@ userRouter
   .route('/avatar')
   .patch(verifyJWT, upload.single('avatar'), updateAvatarImage);
 
-// Route for updating user cover image
-userRouter
-  .route('/cover-image')
-  .patch(verifyJWT, upload.single('coverImage'), updateCoverImage);
 export default userRouter;

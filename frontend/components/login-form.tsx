@@ -25,7 +25,6 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     password: '',
   });
@@ -44,9 +43,8 @@ export function LoginForm({
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.username && !formData.email) {
-      newErrors.username = 'Username or email is required';
-      newErrors.email = 'Username or email is required';
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
     }
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -62,8 +60,7 @@ export function LoginForm({
     setIsLoading(true);
     try {
       await login({
-        username: formData.username || undefined,
-        email: formData.email || undefined,
+        email: formData.email,
         password: formData.password,
       });
       router.push('/dashboard');
@@ -80,23 +77,24 @@ export function LoginForm({
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
-            Enter your email or username below to login to your account
+            Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="username">Username or Email</FieldLabel>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
-                  id="username"
-                  name="username"
-                  value={formData.username}
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter username or email"
+                  placeholder="Enter your email"
                   required
                 />
-                {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </Field>
               <Field>
                 <FieldLabel htmlFor="password">Password</FieldLabel>

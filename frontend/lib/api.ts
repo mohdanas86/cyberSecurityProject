@@ -43,11 +43,7 @@ api.interceptors.response.use(
 );
 
 export const authAPI = {
-  login: async (data: {
-    username?: string;
-    email?: string;
-    password: string;
-  }) => {
+  login: async (data: { email: string; password: string }) => {
     const response = await api.post("/users/login", data);
     return response.data;
   },
