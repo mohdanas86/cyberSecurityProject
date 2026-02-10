@@ -29,14 +29,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         checkAuthStatus();
+
+        // Listen for token expiration events
+        const handleTokenExpired = () => {
+            setUser(null);
+            localStorage.removeItem('accessToken');
+        };
+
+        window.addEventListener('auth:tokenExpired', handleTokenExpired);
+        return () => window.removeEventListener('auth:tokenExpired', handleTokenExpired);
     }, []);
 
     const checkAuthStatus = async () => {
         try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                setUser(null);
+                return;
+            }
+
             const response = await authAPI.getCurrentUser();
             setUser(response.data);
         } catch (error) {
             setUser(null);
+            localStorage.removeItem('accessToken');
         } finally {
             setIsLoading(false);
         }

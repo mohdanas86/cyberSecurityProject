@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface AuthGuardProps {
     children: React.ReactNode;
@@ -17,19 +17,31 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 }) => {
     const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
+    const hasRedirected = useRef(false);
 
     useEffect(() => {
-        if (!isLoading) {
+        if (!isLoading && !hasRedirected.current) {
             if (requireAuth && !isAuthenticated) {
-                router.push(redirectTo);
+                hasRedirected.current = true;
+                router.replace(redirectTo);
             } else if (!requireAuth && isAuthenticated) {
-                router.push('/dashboard');
+                hasRedirected.current = true;
+                router.replace('/dashboard');
             }
         }
     }, [isAuthenticated, isLoading, requireAuth, redirectTo, router]);
 
+    // Reset redirect flag when auth state changes
+    useEffect(() => {
+        hasRedirected.current = false;
+    }, [isAuthenticated]);
+
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+            </div>
+        );
     }
 
     if (requireAuth && !isAuthenticated) {

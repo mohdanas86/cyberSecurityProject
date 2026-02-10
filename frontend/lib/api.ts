@@ -17,12 +17,39 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function onTokenRefreshed(token: string) {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(callback: (token: string) => void) {
+  refreshSubscribers.push(callback);
+}
+
 // Response interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      // Token expired, try to refresh
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      if (isRefreshing) {
+        // If already refreshing, queue the request
+        return new Promise((resolve) => {
+          addRefreshSubscriber((token: string) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
+
       try {
         const refreshResponse = await axios.post(
           `${API_BASE_URL}/users/refresh-token`,
@@ -31,11 +58,24 @@ api.interceptors.response.use(
         );
         const { accessToken } = refreshResponse.data.data;
         localStorage.setItem("accessToken", accessToken);
-        error.config.headers.Authorization = `Bearer ${accessToken}`;
-        return api.request(error.config);
+
+        // Update the failed request with new token
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+        // Notify all queued requests
+        onTokenRefreshed(accessToken);
+        isRefreshing = false;
+
+        return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, redirect to login
-        window.location.href = "/login";
+        // Refresh failed, clear tokens and emit auth error
+        localStorage.removeItem("accessToken");
+        isRefreshing = false;
+        refreshSubscribers = [];
+
+        // Emit custom event for auth context to handle
+        window.dispatchEvent(new CustomEvent("auth:tokenExpired"));
+        return Promise.reject(refreshError);
       }
     }
     return Promise.reject(error);
